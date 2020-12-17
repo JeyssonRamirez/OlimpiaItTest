@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30420.98
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.Presentation", "1.Presentation", "{03DEE05C-73AD-4D42-9931-0CFFC22D7710}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.Application", "2.Application", "{108D5EB0-B3E5-4614-8C38-21A0129F6F9A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.Core", "3.Core", "{58FBD652-7C3A-439A-91D2-9341F897D625}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4.Data", "4.Data", "{A907CA64-2FFB-40BB-85F0-9ED79DC4A640}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5.Crosscutting", "5.Crosscutting", "{FE18C1E0-B833-4607-9FBA-0CEBCBC2B573}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6.Testing", "6.Testing", "{C1AD8BE7-8CF5-484E-A405-BB9108FA1908}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "7.IoC", "7.IoC", "{EAFA7479-5ACF-465F-953C-C9FCEC5DCC87}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Windows", "Windows", "{FD4728E2-1343-4734-B3ED-35A0FD88E63D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Definition", "Definition", "{8E4D15CD-BDE0-4C79-A78E-1663D174B555}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementation", "Implementation", "{A8B9150C-AC85-411B-874F-C3684778CB65}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dtos", "Dtos", "{50CB7818-5231-41D2-9B96-40842DB156F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presentation.Windows.App", "Presentation.Windows.App\Presentation.Windows.App.csproj", "{0F042020-BD38-49D2-9A5A-03519D6FDF16}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Providers", "Providers", "{9BC80E40-2944-467C-BAFD-C96E68EDA173}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess.Provider.Reconoser", "DataAccess.Provider.Reconoser\DataAccess.Provider.Reconoser.csproj", "{F582F152-C5E8-4CE3-B6DE-FD6817924903}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F042020-BD38-49D2-9A5A-03519D6FDF16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F042020-BD38-49D2-9A5A-03519D6FDF16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F042020-BD38-49D2-9A5A-03519D6FDF16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F042020-BD38-49D2-9A5A-03519D6FDF16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F582F152-C5E8-4CE3-B6DE-FD6817924903}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F582F152-C5E8-4CE3-B6DE-FD6817924903}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F582F152-C5E8-4CE3-B6DE-FD6817924903}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F582F152-C5E8-4CE3-B6DE-FD6817924903}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FD4728E2-1343-4734-B3ED-35A0FD88E63D} = {03DEE05C-73AD-4D42-9931-0CFFC22D7710}
+		{8E4D15CD-BDE0-4C79-A78E-1663D174B555} = {108D5EB0-B3E5-4614-8C38-21A0129F6F9A}
+		{A8B9150C-AC85-411B-874F-C3684778CB65} = {108D5EB0-B3E5-4614-8C38-21A0129F6F9A}
+		{50CB7818-5231-41D2-9B96-40842DB156F3} = {58FBD652-7C3A-439A-91D2-9341F897D625}
+		{0F042020-BD38-49D2-9A5A-03519D6FDF16} = {FD4728E2-1343-4734-B3ED-35A0FD88E63D}
+		{9BC80E40-2944-467C-BAFD-C96E68EDA173} = {A907CA64-2FFB-40BB-85F0-9ED79DC4A640}
+		{F582F152-C5E8-4CE3-B6DE-FD6817924903} = {9BC80E40-2944-467C-BAFD-C96E68EDA173}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {585F9EF1-8E11-4DD5-8683-D222752F2276}
+	EndGlobalSection
+EndGlobal
