@@ -1,6 +1,11 @@
-﻿//PRUEBA OLIMPIA
-//La función de la aplicación actual es calcular el saldo final de las cuentas de un "banco", para esto se consume un servicio que devuelve 
-//las transacciones realizas a la cuentas.
+﻿//   -----------------------------------------------------------------------
+//   <copyright file=Form1.cs company="Jeysson Ramirez">
+//       Copyright (c) Jeysson Ramirez Todos los derechos reservados.
+//   </copyright>
+//   <author>Jeysson Stevens  Ramirez </author>
+//   <Date>  2020 -12-17  - 11:55</Date>
+//   <Update> 2020-12-17 - 15:00</Update>
+//   -----------------------------------------------------------------------
 
 //Paso 1: Hacer funcionar la aplicación. Debido al aumento de transacciones y al  colocar al servicio con SSL la aplicación actual esta fallando.
 //Paso 2: Estructurar mejor el codigo. Uso de patrones, buenas practicas, etc.
@@ -8,161 +13,259 @@
 //Paso 4: Adicionar una barra de progreso al formulario. Actualizar la barra con el progreso del proceso, evitando bloqueos del GUI.
 
 
+#region
+
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Presentation.Windows.App.ServicioPrueba;
+
+#endregion
 
 namespace Presentation.Windows.App
 {
     public partial class Form1 : Form
     {
+        public CompletedDate CompletedData;
+
+        public readonly ServiceClient Client;
+
+
+        private List<Thread> _thread;
+        private List<Task> _tasks;
+
+
+        private Stopwatch sw;
         public Form1()
         {
             InitializeComponent();
-        }
-
-        private void btnCalcular_Click(object sender, EventArgs e)
-        {            
-
-            System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
-
-
             //Trust all certificates
-            System.Net.ServicePointManager.ServerCertificateValidationCallback = ((senderOne, certificate, chain, sslPolicyErrors) => true);
-
+            ServicePointManager.ServerCertificateValidationCallback = ((senderOne, certificate, chain, sslPolicyErrors) => true);
             // trust sender
             //System.Net.ServicePointManager.ServerCertificateValidationCallback = ((senderOne, cert, chain, errors) => cert.Subject.Contains("YourServerName"));
+            Client = new ServiceClient();
+        }
 
-            ServicioPrueba.ServiceClient client = new ServicioPrueba.ServiceClient();
+        // On worker thread so do our thing!
+        delegate void SetTextCallback(string text);
+        delegate void SetPercentageCallback(int percentage);
 
-
-            var resp = client.GetData("usuariop", "passwordp");
-
-            //Variable donse se almacenan los saldos finales
-            var balanceList = new List<ServicioPrueba.Saldo>();
-
-            foreach (var currentTransaction in resp)
+        private void SetTextLabelStatus(string text)
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            if (this.labelStatus.InvokeRequired)
             {
-                var cuentaActual = currentTransaction.CuentaOrigen;
-                var claveCifrado = client.GetClaveCifradoCuenta("usuariop", "passwordp", cuentaActual);
-                var movimientoActual = Desencripta(claveCifrado, currentTransaction.TipoTransaccion);
+                SetTextCallback d = new SetTextCallback(SetTextLabelStatus);
+                this.Invoke(d, new object[] { text });
+            }
+            else
+            {
+                this.labelStatus.Text = text;
+            }
+        }
+        private void SetTimeTotal(string text)
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            if (this.labelStatus.InvokeRequired)
+            {
+                SetTextCallback d = new SetTextCallback(SetTimeTotal);
+                this.Invoke(d, new object[] { text });
+            }
+            else
+            {
+                this.lblTiempoTotal.Text = text;
+            }
+        }
+        private void SetPercentage(int percentage)
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            if (this.labelStatus.InvokeRequired)
+            {
+                SetPercentageCallback d = new SetPercentageCallback(SetPercentage);
+                this.Invoke(d, new object[] { percentage });
+            }
+            else
+            {
+                progressBar.Value = percentage;
+            }
+        }
+        private void SetVisibleByNewMethodInvoker(decimal percentage)
+        {
 
-                double saldoActual = -1;
+            
+            if (percentage == 100)
+            {
+                Client.SaveData("usuariop", "passwordp", CompletedData.BalanceList.ToArray());
+                sw.Stop();
+                //btnCalcular.Enabled = true;
+                SetTextLabelStatus("Completado");
+                MessageBox.Show("Termino !!!", "", MessageBoxButtons.OK);
+            }
+            else
+            {
 
-                //Obtenemos el saldo actual de la cuenta
-                foreach (var saldo  in balanceList)
+                switch (labelStatus.Text)
                 {
-                    if (cuentaActual == saldo.CuentaOrigen)
-                    {
-                        saldoActual = saldo.SaldoCuenta;
-
-                        double comision = CalcularComision(Convert.ToInt64(currentTransaction.ValorTransaccion));
-
-                        if (movimientoActual == "Debito")
-                        {
-                            saldo.SaldoCuenta -= currentTransaction.ValorTransaccion;
-                        }
-                        else
-                        {
-                            saldo.SaldoCuenta += currentTransaction.ValorTransaccion - comision;
-                        }
-                    }
+                    case "Procesando":
+                        SetTextLabelStatus($"{percentage} Procesando.");
+                        break;
+                    case "Procesando.":
+                        SetTextLabelStatus($"{percentage} Procesando..");
+                        break;
+                    case "Procesando..":
+                        SetTextLabelStatus($"{percentage} Procesando...");
+                        break;
+                    default:
+                        SetTextLabelStatus($"{percentage} Procesando");
+                        break;
                 }
 
-                //Si no encuentra lo inserta
-                if(saldoActual == -1)
+            }
+            SetTimeTotal(sw.ElapsedMilliseconds.ToString());
+            SetPercentage((int)Math.Round(percentage, 0));
+        }
+        private void btnCalcular_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                CompletedData = new CompletedDate();
+                CompletedData.Counter = 1;
+                CompletedData.ProcessedAccounts = new List<MyAccount>();
+
+                var divider = 1;
+                if (texThreath.Text == "")
                 {
-                    var newBalance = new ServicioPrueba.Saldo();
+                    MessageBox.Show("Por Favor digite el numero de hilos a usar del PC", "", MessageBoxButtons.OK);
+                }
+                else
+                {
+
+                    divider = int.Parse(texThreath.Text);
+
+                    divider = divider == 0 ? 1 : divider;
+
+                    btnCalcular.Enabled = false;
+                    progressBar.Value = 0;
 
 
-                    double comision = CalcularComision(Convert.ToInt64(currentTransaction.ValorTransaccion));
+                    labelStatus.Text = "Consultando Trabajo";
 
-                    newBalance.CuentaOrigen = cuentaActual;                   
-                    if (movimientoActual == "Debito")
+                    sw = Stopwatch.StartNew();
+                    Transaccion[] resp = Client.GetData("usuariop", "passwordp");
+                    CompletedData.Total = resp.Length;
+
+                    CompletedData.BalanceList = new List<Saldo>();
+                    List<IEnumerable<Transaccion>> group= new List<IEnumerable<Transaccion>>();
+                    if (divider == 1)
                     {
-                        newBalance.SaldoCuenta -= currentTransaction.ValorTransaccion;
+                        group = new List<IEnumerable<Transaccion>>
+                        {
+                            resp
+                        };
                     }
                     else
                     {
-                        newBalance.SaldoCuenta += currentTransaction.ValorTransaccion - comision; 
+                        //divider = divider - 1;
+
+                        var countByDivide = resp.Length / divider;
+
+                        int startIndex = 0;
+                        while (startIndex < resp.Length)
+                        {
+                            var item = countByDivide;
+                            if (startIndex + item > resp.Length)
+                            {
+                                item = (startIndex + item) - resp.Length;
+                            }
+
+                            group.Add(resp.Skip(startIndex).Take(item).ToList());
+                            //processArray(group, startIndex, group.First().ThreadCount);
+                            startIndex += countByDivide;
+                        }
+                        //group = Split(resp, divider);
                     }
 
-                    balanceList.Add(newBalance);
-                } 
+
+                    _tasks = new List<Task>();
+                    _thread = new List<Thread>();
+                    var countert = 1;
+                    foreach (var array in group)
+                    {
+                        //Task task = Task.Factory.StartNew(() => ProcessArray(array));
+                        //tasks.Add(task);
+
+                        var worker = new Worker(Client);
+
+                        Thread myNewThread = new Thread(() => worker.ProcessArray(array, ref this.CompletedData, SetVisibleByNewMethodInvoker));
+                        myNewThread.Priority = ThreadPriority.Highest;
+                        myNewThread.Name = "Thread" + countert;
+                        _thread.Add(myNewThread);
+                    }
+
+                    btnStop.Enabled = true;
+
+                    labelStatus.Text = "Procesando";
+                    foreach (var current in _thread)
+                    {
+                        current.Start();
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+
+                MessageBox.Show(exception.InnerException != null ? exception.InnerException.Message : exception.Message, "", MessageBoxButtons.OK);
+            }
+        }
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) &&
+                (e.KeyChar != '.'))
+            {
+                e.Handled = true;
             }
 
+            // only allow one decimal point
+            if ((e.KeyChar == '.') && ((sender as TextBox).Text.IndexOf('.') > -1))
+            {
+                e.Handled = true;
+            }
+        }
 
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            if (_thread != null)
+            {
+                var counter = 1;
+                foreach (var thread in _thread)
+                {
+                    counter++;
+                    thread.Abort($"Proceso {counter} detenido");
+                }
+                _thread = null;
+            }
+
+            CompletedData.Counter = 1;
+            MessageBox.Show("Stop...", "", MessageBoxButtons.OK);
+            btnCalcular.Enabled = true;
+            btnStop.Enabled = false;
+            labelStatus.Text = "Sin Iniciar";
+            progressBar.Value = 0;
             sw.Stop();
-            lblTiempoTotal.Text = sw.ElapsedMilliseconds.ToString();
-
-            //Enviamos los saldos finales
-            client.SaveData("usuariop", "passwordp", balanceList.ToArray());
-
-
-           
-        }
-
-        public long CalcularComision(long n)
-        {
-            
-            var count = 0;
-            long a = 0;
-            while (count < n)
-            {
-                a = 2;
-
-                long b = 2;
-                int prime = 1;
-                while (b * b <= a)
-                {
-                    if (a % b == 0)
-                    {
-                        prime = 0;
-                        break;
-                    }
-                    b++;
-                }
-                if (prime > 0)
-                {
-                    count++;
-                }
-                a++;
-            }
-            return (--a);
-        }
-
-        public string Desencripta(string ClaveCifrado, string Cadena)
-        {
-            //Este metodo no se requiere estructurar / optimizar
-            byte[] Clave = Encoding.ASCII.GetBytes(ClaveCifrado);
-            byte[] IV = Encoding.ASCII.GetBytes("1234567812345678");
-            
-
-            byte[] inputBytes = Convert.FromBase64String(Cadena);
-            string textoLimpio = String.Empty;
-            RijndaelManaged cripto = new RijndaelManaged();
-            using (MemoryStream ms = new MemoryStream(inputBytes))
-            {
-                using (CryptoStream objCryptoStream = new CryptoStream(ms, cripto.CreateDecryptor(Clave, IV), CryptoStreamMode.Read))
-                {
-                    using (StreamReader sr = new StreamReader(objCryptoStream, true))
-                    {
-                        textoLimpio = sr.ReadToEnd();
-                    }
-                }
-            }
-            return textoLimpio;
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }
