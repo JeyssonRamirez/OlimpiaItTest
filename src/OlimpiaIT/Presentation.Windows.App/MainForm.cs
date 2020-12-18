@@ -19,8 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Application.Definition;
 using Core.Entities;
@@ -202,9 +200,6 @@ namespace Presentation.Windows.App
             }
         }
         // This event handler updates the progress.
-
-
-
         private void btnStop_Click(object sender, EventArgs e)
         {
 
@@ -223,20 +218,6 @@ namespace Presentation.Windows.App
             labelStatus.Text = "Sin Iniciar";
             progressBar.Value = 0;
             sw.Stop();
-        }
-
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        {
-            BackgroundWorker worker = sender as BackgroundWorker;
-
-            if (worker.CancellationPending == true)
-            {
-                e.Cancel = true;
-            }
-            // Perform a time consuming operation and report progress.
-
-
-
         }
     }
 }

@@ -87,7 +87,6 @@
             // 
             // backgroundWorker1
             // 
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
             
             // 
             // texThreath
@@ -155,7 +154,7 @@
             this.Controls.Add(this.btnCalcular);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Prueba Lider";
+            this.Text = "Prueba Lider - Jeysson Ramirez";
             this.ResumeLayout(false);
             this.PerformLayout();
 
