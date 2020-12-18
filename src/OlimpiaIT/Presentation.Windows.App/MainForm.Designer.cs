@@ -85,12 +85,9 @@
             this.progressBar.Size = new System.Drawing.Size(457, 23);
             this.progressBar.TabIndex = 4;
             // 
-            // backgroundWorker1
-            // 
-            
-            // 
             // texThreath
             // 
+            this.texThreath.Enabled = false;
             this.texThreath.Location = new System.Drawing.Point(300, 27);
             this.texThreath.MaxLength = 2;
             this.texThreath.Name = "texThreath";
