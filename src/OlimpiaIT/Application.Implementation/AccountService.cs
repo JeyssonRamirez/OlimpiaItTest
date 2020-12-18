@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace Application.Implementation
     public class AccountService : IAccountService
     {
         private IReconoserRepository _reconoserRepository;
+        private List<Thread> _thread;
+
         public AccountService(IReconoserRepository reconoserRepository)
         {
             _reconoserRepository = reconoserRepository;
@@ -75,7 +78,7 @@ namespace Application.Implementation
 
             return (--a);
         }
-        public void ProcessArray(List<Transaction> data, ref CompletedData referenceData, Delegate call)
+        public void ProcessArray(List<Transaction> data, ref CompletedData referenceData, UpdateStatusEventHandler call)
         {
             try
             {
@@ -143,7 +146,7 @@ namespace Application.Implementation
 
                     decimal percentage = 100 / referenceData.Total * referenceData.Counter;
                     referenceData.Counter++;
-                    //call(Math.Round(percentage, 2));
+                    call(Math.Round(percentage, 2));
                 }
             }
             catch (ThreadAbortException)
@@ -164,19 +167,35 @@ namespace Application.Implementation
             _reconoserRepository.SaveData(usuariop, usuariop, balances);
         }
 
-        public void ProcessCompleted(int divider)
+        public List<Transaction> GetData()
+        {
+            return _reconoserRepository.GetData("usuariop", "passwordp");
+        }
+
+        public void CancelProcess()
+        {
+            if (_thread != null)
+            {
+                var counter = 1;
+                foreach (var thread in _thread)
+                {
+                    counter++;
+                    thread.Abort($"Proceso {counter} detenido");
+                }
+                _thread = null;
+            }
+        }
+
+
+        public void ProcessCompleted(int divider, List<Transaction> resp)
         {
             var CompletedData = new CompletedData();
 
 
             divider = divider == 0 ? 1 : divider;
 
-            //btnCalcular.Enabled = false;
-            //progressBar.Value = 0;
-            //labelStatus.Text = "Consultando Trabajo";
-
-            //sw = Stopwatch.StartNew();
-            var resp = _reconoserRepository.GetData("usuariop", "passwordp");
+         
+            //var resp = _reconoserRepository.GetData("usuariop", "passwordp");
             CompletedData.Total = resp.Count;
 
             CompletedData.BalanceList = new List<Balance>();
@@ -208,8 +227,8 @@ namespace Application.Implementation
             }
 
 
-            var _tasks = new List<Task>();
-            var _thread = new List<Thread>();
+            
+            _thread = new List<Thread>();
             var countert = 1;
             foreach (var array in group)
             {

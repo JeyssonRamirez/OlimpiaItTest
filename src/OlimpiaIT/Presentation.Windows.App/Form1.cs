@@ -36,12 +36,6 @@ namespace Presentation.Windows.App
     {
         private readonly IAccountService _accountService;
         public CompletedData CompletedData;
-
-
-        private List<Thread> _thread;
-        private List<Task> _tasks;
-
-
         private Stopwatch sw;
         public Form1()
         {
@@ -149,7 +143,27 @@ namespace Presentation.Windows.App
                 }
                 else
                 {
-                    _accountService.ProcessCompleted(int.Parse(texThreath.Text));
+
+
+                    btnCalcular.Enabled = false;
+                    progressBar.Value = 0;
+                    labelStatus.Text = "Consultando Trabajo";
+
+                    sw = Stopwatch.StartNew();
+                    var data = _accountService.GetData();
+                    CompletedData = new CompletedData
+                    {
+                        BalanceList = new List<Balance>(),
+                        Counter = 1,
+                        ProcessedAccounts = new List<MyAccount>(),
+                        Total = data.Count
+                    };
+
+                    _accountService.ProcessArray(data,ref CompletedData, SetVisibleByNewMethodInvoker);
+                    //_accountService.ProcessCompleted(int.Parse(texThreath.Text),data);
+
+
+
                 }
             }
             catch (Exception exception)
@@ -268,17 +282,7 @@ namespace Presentation.Windows.App
 
         private void btnStop_Click(object sender, EventArgs e)
         {
-            if (_thread != null)
-            {
-                var counter = 1;
-                foreach (var thread in _thread)
-                {
-                    counter++;
-                    thread.Abort($"Proceso {counter} detenido");
-                }
-                _thread = null;
-            }
-
+            _accountService.CancelProcess();
             CompletedData.Counter = 1;
             MessageBox.Show("Stop...", "", MessageBoxButtons.OK);
             btnCalcular.Enabled = true;
