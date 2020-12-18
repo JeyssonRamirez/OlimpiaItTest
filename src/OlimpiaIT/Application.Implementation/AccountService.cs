@@ -78,7 +78,7 @@ namespace Application.Implementation
 
             return (--a);
         }
-        public void ProcessArray(List<Transaction> data, ref CompletedData referenceData, UpdateStatusEventHandler call)
+        public void ProcessArray(List<Transaction> data, CompletedData referenceData, UpdateStatusEventHandler call)
         {
             try
             {
@@ -146,19 +146,18 @@ namespace Application.Implementation
 
                     decimal percentage = 100 / referenceData.Total * referenceData.Counter;
                     referenceData.Counter++;
-                    call(Math.Round(percentage, 2));
+                    call(Math.Round(percentage, 2),"");
                 }
             }
-            catch (ThreadAbortException)
+            catch (ThreadAbortException e)
             {
 
-                //MessageBox.Show("Proceso Detenido", "", MessageBoxButtons.OK);
-                //throw abortException;
+                call(0, e.Message);
             }
 
             catch (Exception e)
             {
-
+                call(0, e.Message);
             }
         }
         
@@ -187,18 +186,11 @@ namespace Application.Implementation
         }
 
 
-        public void ProcessCompleted(int divider, List<Transaction> resp)
+        public void ProcessCompleted(int divider,  CompletedData referenceData, List<Transaction> resp, UpdateStatusEventHandler call)
         {
-            var CompletedData = new CompletedData();
-
-
             divider = divider == 0 ? 1 : divider;
-
-         
-            //var resp = _reconoserRepository.GetData("usuariop", "passwordp");
-            CompletedData.Total = resp.Count;
-
-            CompletedData.BalanceList = new List<Balance>();
+            referenceData.Total = resp.Count;
+            referenceData.BalanceList = new List<Balance>();
             List<List<Transaction>> group = new List<List<Transaction>>();
             if (divider == 1)
             {
@@ -206,7 +198,7 @@ namespace Application.Implementation
             }
             else
             {
-                //divider = divider - 1;
+                divider = divider - 1;
 
                 var countByDivide = resp.Count / divider;
 
@@ -226,16 +218,17 @@ namespace Application.Implementation
                 //group = Split(resp, divider);
             }
 
+         
 
-            
+
+
             _thread = new List<Thread>();
             var countert = 1;
             foreach (var array in group)
             {
                 //Task task = Task.Factory.StartNew(() => ProcessArray(array));
                 //tasks.Add(task);
-
-                Thread myNewThread = new Thread(() => ProcessArray(array, ref CompletedData, null));
+                Thread myNewThread = new Thread(() => ProcessArray(array, referenceData, call));
                 myNewThread.Priority = ThreadPriority.Highest;
                 myNewThread.Name = "Thread" + countert;
                 _thread.Add(myNewThread);

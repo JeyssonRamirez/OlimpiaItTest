@@ -1,6 +1,6 @@
 ﻿namespace Presentation.Windows.App
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Variable del diseñador necesaria.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.btnCalcular = new System.Windows.Forms.Button();
             this.lblTiempoTotal = new System.Windows.Forms.Label();
             this.lblTiempo = new System.Windows.Forms.Label();
@@ -85,9 +85,13 @@
             this.progressBar.Size = new System.Drawing.Size(457, 23);
             this.progressBar.TabIndex = 4;
             // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            
+            // 
             // texThreath
             // 
-            this.texThreath.Enabled = false;
             this.texThreath.Location = new System.Drawing.Point(300, 27);
             this.texThreath.MaxLength = 2;
             this.texThreath.Name = "texThreath";
@@ -134,7 +138,7 @@
             this.btnStop.UseVisualStyleBackColor = true;
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -149,7 +153,8 @@
             this.Controls.Add(this.lblTiempo);
             this.Controls.Add(this.lblTiempoTotal);
             this.Controls.Add(this.btnCalcular);
-            this.Name = "Form1";
+            this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Prueba Lider";
             this.ResumeLayout(false);
             this.PerformLayout();

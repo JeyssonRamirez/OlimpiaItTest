@@ -4,11 +4,13 @@ using Core.Entities;
 
 namespace Application.Definition
 {
-    public delegate void UpdateStatusEventHandler(decimal status);
+    public delegate void UpdateStatusEventHandler(decimal status,string error);
     public interface IAccountService
     {
-        void ProcessArray(List<Transaction> data, ref CompletedData referenceData, UpdateStatusEventHandler call);
-        void ProcessCompleted(int divider, List<Transaction> data);
+        void ProcessArray(List<Transaction> data,  CompletedData referenceData, UpdateStatusEventHandler call);
+
+        void ProcessCompleted(int divider, CompletedData referenceData, List<Transaction> resp,
+            UpdateStatusEventHandler call);
         void SaveData(string user, string password, List<Balance> balances);
         List<Transaction> GetData();
 
