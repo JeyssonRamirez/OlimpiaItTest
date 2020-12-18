@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F582F152-C5E8-4CE3-B6DE-FD6817924903}</ProjectGuid>
+    <ProjectGuid>{B73FAC78-42FD-4E44-8B3E-98D49068F825}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DataAccess.Provider.Reconoser</RootNamespace>
-    <AssemblyName>DataAccess.Provider.Reconoser</AssemblyName>
+    <RootNamespace>Crosscutting.DependencyInjectionFactory</RootNamespace>
+    <AssemblyName>Crosscutting.DependencyInjectionFactory</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -33,69 +33,47 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Unity.Abstractions, Version=5.11.6.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.11.9\lib\net47\Unity.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Container, Version=5.11.10.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.11.9\lib\net47\Unity.Container.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Connected Services\ServicioPrueba\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
-    <Compile Include="ReconoserRepository.cs" />
-    <None Include="Connected Services\ServicioPrueba\Service.wsdl" />
-    <None Include="Connected Services\ServicioPrueba\Service.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\ServicioPrueba\Service1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\ServicioPrueba\Service2.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\ServicioPrueba\WindowsLiderEntrega.ServicioPrueba.Transaccion.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
+    <Compile Include="ContainerInitializer.cs" />
+    <Compile Include="DiContainer.cs" />
+    <Compile Include="Factory.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Connected Services\ServicioPrueba\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\ServicioPrueba\Service.disco" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\ServicioPrueba\configuration91.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\ServicioPrueba\configuration.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\ServicioPrueba\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Core.Entities\Core.Entities.csproj">
-      <Project>{624CC133-914B-4DFE-93C3-76430F674FE2}</Project>
-      <Name>Core.Entities</Name>
+    <ProjectReference Include="..\Application.Definition\Application.Definition.csproj">
+      <Project>{15430838-AF79-4839-833C-3FA45B6C69ED}</Project>
+      <Name>Application.Definition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Application.Implementation\Application.Implementation.csproj">
+      <Project>{D141711D-DCF2-4EFB-8B90-D22EA0BC3764}</Project>
+      <Name>Application.Implementation</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.GlobalRepository\Core.GlobalRepository.csproj">
       <Project>{764C2352-2E11-46A7-AECE-B0BE86E4381C}</Project>
       <Name>Core.GlobalRepository</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccess.Provider.Reconoser\DataAccess.Provider.Reconoser.csproj">
+      <Project>{F582F152-C5E8-4CE3-B6DE-FD6817924903}</Project>
+      <Name>DataAccess.Provider.Reconoser</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

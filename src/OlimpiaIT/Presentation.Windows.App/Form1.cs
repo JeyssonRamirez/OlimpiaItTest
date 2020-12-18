@@ -24,7 +24,9 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Presentation.Windows.App.ServicioPrueba;
+using Application.Definition;
+using Core.Entities;
+using Crosscutting.DependencyInjectionFactory;
 
 #endregion
 
@@ -32,9 +34,8 @@ namespace Presentation.Windows.App
 {
     public partial class Form1 : Form
     {
-        public CompletedDate CompletedData;
-
-        public readonly ServiceClient Client;
+        private readonly IAccountService _accountService;
+        public CompletedData CompletedData;
 
 
         private List<Thread> _thread;
@@ -44,12 +45,10 @@ namespace Presentation.Windows.App
         private Stopwatch sw;
         public Form1()
         {
+            
             InitializeComponent();
+            _accountService = Factory.Resolve<IAccountService>();
             //Trust all certificates
-            ServicePointManager.ServerCertificateValidationCallback = ((senderOne, certificate, chain, sslPolicyErrors) => true);
-            // trust sender
-            //System.Net.ServicePointManager.ServerCertificateValidationCallback = ((senderOne, cert, chain, errors) => cert.Subject.Contains("YourServerName"));
-            Client = new ServiceClient();
         }
 
         // On worker thread so do our thing!
@@ -107,7 +106,10 @@ namespace Presentation.Windows.App
             
             if (percentage == 100)
             {
-                Client.SaveData("usuariop", "passwordp", CompletedData.BalanceList.ToArray());
+
+                _accountService.SaveData("usuariop", "passwordp", CompletedData.BalanceList);
+
+                //Client.SaveData("usuariop", "passwordp", CompletedData.BalanceList);
                 sw.Stop();
                 //btnCalcular.Enabled = true;
                 SetTextLabelStatus("Completado");
@@ -141,94 +143,112 @@ namespace Presentation.Windows.App
 
             try
             {
-                CompletedData = new CompletedDate();
-                CompletedData.Counter = 1;
-                CompletedData.ProcessedAccounts = new List<MyAccount>();
-
-                var divider = 1;
                 if (texThreath.Text == "")
                 {
                     MessageBox.Show("Por Favor digite el numero de hilos a usar del PC", "", MessageBoxButtons.OK);
                 }
                 else
                 {
-
-                    divider = int.Parse(texThreath.Text);
-
-                    divider = divider == 0 ? 1 : divider;
-
-                    btnCalcular.Enabled = false;
-                    progressBar.Value = 0;
-
-
-                    labelStatus.Text = "Consultando Trabajo";
-
-                    sw = Stopwatch.StartNew();
-                    Transaccion[] resp = Client.GetData("usuariop", "passwordp");
-                    CompletedData.Total = resp.Length;
-
-                    CompletedData.BalanceList = new List<Saldo>();
-                    List<IEnumerable<Transaccion>> group= new List<IEnumerable<Transaccion>>();
-                    if (divider == 1)
-                    {
-                        group = new List<IEnumerable<Transaccion>>
-                        {
-                            resp
-                        };
-                    }
-                    else
-                    {
-                        //divider = divider - 1;
-
-                        var countByDivide = resp.Length / divider;
-
-                        int startIndex = 0;
-                        while (startIndex < resp.Length)
-                        {
-                            var item = countByDivide;
-                            if (startIndex + item > resp.Length)
-                            {
-                                item = (startIndex + item) - resp.Length;
-                            }
-
-                            group.Add(resp.Skip(startIndex).Take(item).ToList());
-                            //processArray(group, startIndex, group.First().ThreadCount);
-                            startIndex += countByDivide;
-                        }
-                        //group = Split(resp, divider);
-                    }
-
-
-                    _tasks = new List<Task>();
-                    _thread = new List<Thread>();
-                    var countert = 1;
-                    foreach (var array in group)
-                    {
-                        //Task task = Task.Factory.StartNew(() => ProcessArray(array));
-                        //tasks.Add(task);
-
-                        var worker = new Worker(Client);
-
-                        Thread myNewThread = new Thread(() => worker.ProcessArray(array, ref this.CompletedData, SetVisibleByNewMethodInvoker));
-                        myNewThread.Priority = ThreadPriority.Highest;
-                        myNewThread.Name = "Thread" + countert;
-                        _thread.Add(myNewThread);
-                    }
-
-                    btnStop.Enabled = true;
-
-                    labelStatus.Text = "Procesando";
-                    foreach (var current in _thread)
-                    {
-                        current.Start();
-                    }
+                    _accountService.ProcessCompleted(int.Parse(texThreath.Text));
                 }
             }
             catch (Exception exception)
             {
-
                 MessageBox.Show(exception.InnerException != null ? exception.InnerException.Message : exception.Message, "", MessageBoxButtons.OK);
             }
+            
+
+            //try
+            //{
+            //    CompletedData = new CompletedData();
+            //    CompletedData.Counter = 1;
+            //    CompletedData.ProcessedAccounts = new List<MyAccount>();
+
+            //    var divider = 1;
+            //    if (texThreath.Text == "")
+            //    {
+            //        MessageBox.Show("Por Favor digite el numero de hilos a usar del PC", "", MessageBoxButtons.OK);
+            //    }
+            //    else
+            //    {
+
+            //        divider = int.Parse(texThreath.Text);
+
+            //        divider = divider == 0 ? 1 : divider;
+
+            //        btnCalcular.Enabled = false;
+            //        progressBar.Value = 0;
+
+
+            //        labelStatus.Text = "Consultando Trabajo";
+
+            //        sw = Stopwatch.StartNew();
+            //        Transaccion[] resp = Client.GetData("usuariop", "passwordp");
+            //        CompletedData.Total = resp.Length;
+
+            //        CompletedData.BalanceList = new List<Balance>();
+            //        List<IEnumerable<Transaccion>> group= new List<IEnumerable<Transaccion>>();
+            //        if (divider == 1)
+            //        {
+            //            group = new List<IEnumerable<Transaccion>>
+            //            {
+            //                resp
+            //            };
+            //        }
+            //        else
+            //        {
+            //            //divider = divider - 1;
+
+            //            var countByDivide = resp.Length / divider;
+
+            //            int startIndex = 0;
+            //            while (startIndex < resp.Length)
+            //            {
+            //                var item = countByDivide;
+            //                if (startIndex + item > resp.Length)
+            //                {
+            //                    item = (startIndex + item) - resp.Length;
+            //                }
+
+            //                group.Add(resp.Skip(startIndex).Take(item).ToList());
+            //                //processArray(group, startIndex, group.First().ThreadCount);
+            //                startIndex += countByDivide;
+            //            }
+            //            //group = Split(resp, divider);
+            //        }
+
+
+            //        _tasks = new List<Task>();
+            //        _thread = new List<Thread>();
+            //        var countert = 1;
+            //        foreach (var array in group)
+            //        {
+            //            //Task task = Task.Factory.StartNew(() => ProcessArray(array));
+            //            //tasks.Add(task);
+
+            //            _accountService.ProcessArray(array,);
+            //            var worker = new Worker(Client);
+
+            //            Thread myNewThread = new Thread(() => worker.ProcessArray(array, ref this.CompletedData, SetVisibleByNewMethodInvoker));
+            //            myNewThread.Priority = ThreadPriority.Highest;
+            //            myNewThread.Name = "Thread" + countert;
+            //            _thread.Add(myNewThread);
+            //        }
+
+            //        btnStop.Enabled = true;
+
+            //        labelStatus.Text = "Procesando";
+            //        foreach (var current in _thread)
+            //        {
+            //            current.Start();
+            //        }
+            //    }
+            //}
+            //catch (Exception exception)
+            //{
+
+            //    
+            //}
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)

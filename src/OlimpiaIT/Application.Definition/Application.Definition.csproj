@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{624CC133-914B-4DFE-93C3-76430F674FE2}</ProjectGuid>
+    <ProjectGuid>{15430838-AF79-4839-833C-3FA45B6C69ED}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Core.Entities</RootNamespace>
-    <AssemblyName>Core.Entities</AssemblyName>
+    <RootNamespace>Application.Definition</RootNamespace>
+    <AssemblyName>Application.Definition</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -41,11 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompletedData.cs" />
-    <Compile Include="MyAccount.cs" />
+    <Compile Include="IAccountService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Balance.cs" />
-    <Compile Include="Transaction.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core.Entities\Core.Entities.csproj">
+      <Project>{624CC133-914B-4DFE-93C3-76430F674FE2}</Project>
+      <Name>Core.Entities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
